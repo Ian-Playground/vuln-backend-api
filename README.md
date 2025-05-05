@@ -60,12 +60,20 @@ docker compose -p vuln-dashboard exec vuln-api chmod -R 775 storage bootstrap/ca
 
 The API documentation is available through Swagger UI at http://localhost:8081
 
+> **Important:** You must generate the Swagger documentation before accessing the Swagger UI.  
+> If you visit http://localhost:8081 before running the generate command below, the UI will not load properly.
+
 To generate/update the API documentation:
 
 ```bash
 # Generate Swagger documentation
 docker compose -p vuln-dashboard exec vuln-api php artisan l5-swagger:generate
+
+# Restart Swagger UI container to pick up the new documentation
+docker compose -p vuln-dashboard restart swagger-ui
 ```
+
+After generating the documentation and restarting the Swagger UI container, you can access the Swagger UI at http://localhost:8081
 
 ### Useful Commands
 
