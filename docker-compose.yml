@@ -1,10 +1,10 @@
-version: '3.8'
 services:
-  vuln_dashboard.api:
+  vuln-api:
     build:
       context: .
       dockerfile: Dockerfile
     image: vuln-backend-api
+    container_name: vuln-api
     ports:
       - '8000:8000'
     environment:
@@ -18,8 +18,6 @@ services:
       DB_PASSWORD: secret
       REDIS_HOST: redis
       REDIS_PORT: 6379
-    volumes:
-      - '.:/var/www/html'
     networks:
       - sail
     depends_on:
@@ -39,7 +37,7 @@ services:
     networks:
       - sail
     depends_on:
-      - vuln_dashboard.api
+      - vuln-api
 
   pgsql:
     image: postgres:15
