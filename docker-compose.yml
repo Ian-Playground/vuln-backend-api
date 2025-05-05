@@ -1,0 +1,73 @@
+version: '3.8'
+services:
+  vuln_dashboard.api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: vuln-backend-api
+    ports:
+      - '8000:8000'
+    environment:
+      APP_ENV: local
+      APP_DEBUG: true
+      DB_CONNECTION: pgsql
+      DB_HOST: pgsql
+      DB_PORT: 5432
+      DB_DATABASE: vuln_dashboard
+      DB_USERNAME: laravel
+      DB_PASSWORD: secret
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+    volumes:
+      - '.:/var/www/html'
+    networks:
+      - sail
+    depends_on:
+      - pgsql
+      - redis
+
+  swagger-ui:
+    image: swaggerapi/swagger-ui
+    container_name: vuln-swagger-ui
+    ports:
+      - "8081:8080"
+    environment:
+      SWAGGER_JSON: /docs/api-docs.json
+      SWAGGER_URL: http://localhost:8000/api/documentation
+    volumes:
+      - ./storage/api-docs:/docs:ro
+    networks:
+      - sail
+    depends_on:
+      - vuln_dashboard.api
+
+  pgsql:
+    image: postgres:15
+    container_name: vuln-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: vuln_dashboard
+      POSTGRES_USER: laravel
+      POSTGRES_PASSWORD: secret
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgsql_data:/var/lib/postgresql/data
+    networks:
+      - sail
+
+  redis:
+    image: redis:7-alpine
+    container_name: vuln-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - sail
+
+networks:
+  sail:
+    driver: bridge
+
+volumes:
+  pgsql_data:
